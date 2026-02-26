@@ -1,6 +1,7 @@
 package com.yareach.voting_tictactoe_system.player.entity
 
 import com.yareach.voting_tictactoe_system.player.common.Team
+import com.yareach.voting_tictactoe_system.player.model.Player
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -19,7 +20,19 @@ class PlayerR2dbcEntity(
     @Column("team")
     val team: Team?
 ) {
-    override fun toString(): String {
-        return "$id: $userId, $groupId, $team"
+    companion object {
+        fun fromModel(model: Player): PlayerR2dbcEntity = PlayerR2dbcEntity(
+            id = model.id,
+            groupId = model.groupId,
+            userId = model.userId,
+            team = model.team
+        )
     }
+
+    fun toModel(): Player = Player(
+        id = id,
+        groupId = groupId,
+        userId = userId,
+        team = team
+    )
 }

@@ -13,4 +13,10 @@ interface PlayerR2dbcRepository: CoroutineCrudRepository<PlayerR2dbcEntity, Long
     suspend fun findByGroupIdAndTeam(groupId: String, team: Team): Flow<PlayerR2dbcEntity>
 
     suspend fun findByGroupIdAndUserId(groupId: String, userId: String): PlayerR2dbcEntity?
+
+    suspend fun existsByGroupIdAndUserId(groupId: String, userId: String): Boolean
+
+    suspend fun deleteByGroupId(groupId: String): Long
+
+    suspend fun deleteByGroupIdAndUserId(groupId: String, userId: String): Long
 }
