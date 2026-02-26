@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: voting_tictactoe_system
