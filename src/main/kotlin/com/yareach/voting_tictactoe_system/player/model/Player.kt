@@ -6,9 +6,9 @@ class Player(
     val id: Long? = null,
     val groupId: String,
     val userId: String,
-    var team: Team? = null
+    val team: Team
 ) {
     companion object {
-        fun new(groupId: String, userId: String) = Player(groupId = groupId, userId = userId)
+        fun new(groupId: String, userId: String, team: Team) = Player(groupId = groupId, userId = userId, team = team)
     }
 }

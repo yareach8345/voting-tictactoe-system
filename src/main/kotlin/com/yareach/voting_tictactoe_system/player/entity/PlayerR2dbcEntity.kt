@@ -18,7 +18,7 @@ class PlayerR2dbcEntity(
     val userId: String,
 
     @Column("team")
-    val team: Team?
+    val team: Team
 ) {
     companion object {
         fun fromModel(model: Player): PlayerR2dbcEntity = PlayerR2dbcEntity(

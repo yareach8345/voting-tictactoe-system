@@ -5,6 +5,7 @@ import com.yareach.voting_tictactoe_system.player.model.Player
 import com.yareach.voting_tictactoe_system.player.repository.PlayerR2dbcRepository
 import com.yareach.voting_tictactoe_system.player.repository.PlayerRepository
 import com.yareach.voting_tictactoe_system.player.repository.PlayerRepositoryR2dbcImpl
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
@@ -39,6 +40,64 @@ class PlayerRepositoryTest {
     }
 
     @Nested
+    @DisplayName("プレイヤーデータ保存")
+    inner class SaveDataTest {
+
+        @Nested
+        @DisplayName("単一データ保存")
+        inner class SaveTest {
+
+            @Test
+            @DisplayName("[Success Case] エンティティーのＩＤフィールドが空いている場合、新しいデータを保存")
+            fun saveDataSuccessfully() = runTest {
+                val newPlayer = Player.new("group1", "user1", Team.O)
+
+                val saveResult = playerRepository.save(newPlayer)
+
+                val allPlayerInDb = playerR2dbcRepository.findAll().toList()
+
+                assertNotNull(saveResult.id)
+
+                assertEquals(1, allPlayerInDb.size)
+                assertEquals("group1", allPlayerInDb.first().groupId)
+                assertEquals("user1", allPlayerInDb.first().userId)
+            }
+
+            @Test
+            @DisplayName("[Success Case] エンティティーのＩＤフィールドが空いていない場合、データを更新")
+            fun updateDataSuccessfully() = runTest {
+                val newPlayer = Player.new("group1", "user1", Team.O)
+
+                val saveResult = playerRepository.save(newPlayer)
+
+                val updateResult = playerRepository.save(saveResult)
+
+                assertEquals("group1", updateResult.groupId)
+                assertEquals("user1", updateResult.userId)
+                assertEquals(Team.O, updateResult.team)
+            }
+        }
+
+        @Nested
+        @DisplayName("複数のプレイヤーデータを保存")
+        inner class SaveAllTest {
+
+            @Test
+            @DisplayName("[Success Case] 複数のプレイヤーデータを保存")
+            fun saveDataSuccessfully() = runTest {
+                val players = List(5) { i -> Player.new("group1", "user$i", Team.O) }
+
+                val savedResult = playerRepository.saveAll(players)
+
+                val findResult = playerRepository.findByGroupId("group1")
+
+                assertEquals(5, savedResult.count())
+                assertEquals(5, findResult.count())
+            }
+        }
+    }
+
+    @Nested
     @DisplayName("データ取得")
     inner class FindDataTest {
 
@@ -49,7 +108,7 @@ class PlayerRepositoryTest {
             @Test
             @DisplayName("[Success Case] グループＩＤでグループに所属するメンバーを取得")
             fun successCase() = runTest {
-                repeat(3) { i -> playerRepository.save(Player.new("group1", "user$i")) }
+                repeat(3) { i -> playerRepository.save(Player.new("group1", "user$i", Team.X)) }
 
                 val result = playerRepository.findByGroupId("group1").toList()
 
@@ -130,7 +189,7 @@ class PlayerRepositoryTest {
             @Test
             @DisplayName("[Success Case] 該当するデータが存在する場合、trueを返す")
             fun whenMatchingDataIsExists() = runTest {
-                playerRepository.save(Player.new(groupId = "group1", userId = "user1"))
+                playerRepository.save(Player.new(groupId = "group1", userId = "user1", team = Team.X))
 
                 val result = playerRepository.existsByGroupIdAndUserId("group1", "user1")
 
@@ -158,7 +217,7 @@ class PlayerRepositoryTest {
             @Test
             @DisplayName("[Success Case] 該当するプレイヤーのデータを削除し、削除したプレイヤーの数を返す")
             fun deletePlayersSuccessfully() = runTest {
-                repeat(3) { i -> playerRepository.save(Player.new(groupId = "group1", userId = "user$i")) }
+                repeat(3) { i -> playerRepository.save(Player.new(groupId = "group1", userId = "user$i", team = Team.O)) }
 
                 val result = playerRepository.deleteByGroupId("group1")
 
@@ -181,7 +240,7 @@ class PlayerRepositoryTest {
             @Test
             @DisplayName("[Success Case] 該当するデータを削除し、1を返す")
             fun whenMatchingDataIsExist() = runTest {
-                playerRepository.save(Player.new(groupId = "group1", userId = "user1"))
+                playerRepository.save(Player.new(groupId = "group1", userId = "user1", team = Team.O))
 
                 val result = playerRepository.deleteByGroupIdAndUserId("group1", "user1")
 

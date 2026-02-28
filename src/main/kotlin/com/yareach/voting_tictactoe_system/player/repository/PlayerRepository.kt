@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository
 interface PlayerRepository {
     suspend fun save(player: Player): Player
 
+    suspend fun saveAll(players: List<Player>): Flow<Player>
+
     suspend fun findByGroupId(groupId: String): Flow<Player>
 
     suspend fun findByGroupIdAndTeam(groupId: String, team: Team): Flow<Player>
@@ -30,6 +32,12 @@ class PlayerRepositoryR2dbcImpl(
     override suspend fun save(player: Player): Player {
         val entity = PlayerR2dbcEntity.fromModel(player)
         return playerR2dbcRepository.save(entity).toModel()
+    }
+
+    override suspend fun saveAll(players: List<Player>): Flow<Player> {
+        val entities = players.map{ PlayerR2dbcEntity.fromModel(it) }
+
+        return playerR2dbcRepository.saveAll(entities).map { it.toModel() }
     }
 
     override suspend fun findByGroupId(groupId: String): Flow<Player> {
