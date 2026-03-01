@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.yareach.voting_tictactoe_system.player.proto";
+option java_outer_classname = "PlayerServiceProto";
+
+service PlayerService {
+  rpc recruitPlayer(stream RecruitRequestMessage) returns (stream RecruitStreamMessage) {};
+
+  rpc getUserIdsInGroup(GroupId) returns (PlayersByTeam) {};
+
+  rpc deleteAllUserInGroupId(GroupId) returns (AllPlayerDeleteResult) {};
+}
+
+message InitRecruiting {
+  string groupId = 1;
+}
+
+message AddNewPlayer {
+  string userId = 1;
+}
+
+message RecruitRequestMessage {
+  oneof payload {
+    InitRecruiting init = 1;
+    AddNewPlayer addUser = 2;
+  }
+}
+
+message RecruitAccepted {
+  string userId = 1;
+}
+
+message PlayersByTeam {
+  repeated string userIdsInTeamX = 1;
+  repeated string userIdsInTeamO = 2;
+}
+
+message RecruitCompleted {
+  PlayersByTeam playersByTeam = 1;
+}
+
+message RecruitStreamMessage {
+  oneof payload {
+    RecruitAccepted accepted = 1;
+    RecruitCompleted completed = 2;
+  }
+}
+
+message GroupId {
+  string groupId = 1;
+}
+
+message AllPlayerDeleteResult {
+  string groupId = 1;
+}

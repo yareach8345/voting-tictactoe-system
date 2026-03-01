@@ -22,6 +22,7 @@ repositories {
 
 ext {
     set('springGrpcVersion', "1.0.2")
+    set('grpcKotlinVersion', "1.2.1")
 }
 
 dependencies {
@@ -29,6 +30,9 @@ dependencies {
     implementation 'io.asyncer:r2dbc-mysql'
     implementation 'org.springframework.boot:spring-boot-starter-webclient'
     implementation 'io.grpc:grpc-services'
+    implementation "io.grpc:grpc-kotlin-stub"
+    implementation "io.grpc:grpc-protobuf"
+    implementation "com.google.protobuf:protobuf-kotlin"
     implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
@@ -42,6 +46,7 @@ dependencies {
     testImplementation 'org.springframework.grpc:spring-grpc-test'
     testImplementation 'com.h2database:h2'
     testImplementation 'io.r2dbc:r2dbc-h2'
+    testImplementation 'io.mockk:mockk:1.14.9'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -65,10 +70,16 @@ protobuf {
         grpc {
             artifact = 'io.grpc:protoc-gen-grpc-java'
         }
+        grpckt {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpcKotlinVersion:jdk7@jar"
+        }
     }
     generateProtoTasks {
         all()*.plugins {
             grpc {
+                option '@generated=omit'
+            }
+            grpckt {
                 option '@generated=omit'
             }
         }
