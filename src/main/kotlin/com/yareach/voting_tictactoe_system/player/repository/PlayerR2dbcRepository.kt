@@ -14,6 +14,8 @@ interface PlayerR2dbcRepository: CoroutineCrudRepository<PlayerR2dbcEntity, Long
 
     suspend fun findByGroupIdAndUserId(groupId: String, userId: String): PlayerR2dbcEntity?
 
+    suspend fun existsByGroupId(groupId: String): Boolean
+
     suspend fun existsByGroupIdAndUserId(groupId: String, userId: String): Boolean
 
     suspend fun deleteByGroupId(groupId: String): Long

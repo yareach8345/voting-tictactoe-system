@@ -183,6 +183,29 @@ class PlayerRepositoryTest {
     inner class CheckDataExist {
 
         @Nested
+        @DisplayName("特定のグループの所属のユーザーの存在確認")
+        inner class ExistsByGroupIdTest {
+
+            @Test
+            @DisplayName("[success case] グループに属するユーザーがあればtrueを返す")
+            fun existMatchingUser() = runTest {
+                playerRepository.save(Player.new(groupId = "group1", userId = "user1", team = Team.X))
+
+                val result = playerRepository.existsByGroupId("group1")
+
+                assertTrue(result)
+            }
+
+            @Test
+            @DisplayName("[success case] グループに属するユーザーが存在しない場合、falseを返す")
+            fun notExistMatchingUser() = runTest {
+                val result = playerRepository.existsByGroupId("group1")
+
+                assertFalse(result)
+            }
+        }
+
+        @Nested
         @DisplayName("特定のプレイヤーの存在確認")
         inner class ExistsByGroupAndUserIdTest {
 

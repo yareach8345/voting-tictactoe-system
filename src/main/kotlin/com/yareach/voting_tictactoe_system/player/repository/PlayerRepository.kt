@@ -18,6 +18,8 @@ interface PlayerRepository {
 
     suspend fun findByGroupIdAndUserId(groupId: String, userId: String): Player?
 
+    suspend fun existsByGroupId(groupId: String): Boolean
+
     suspend fun existsByGroupIdAndUserId(groupId: String, userId: String): Boolean
 
     suspend fun deleteByGroupId(groupId: String): Long
@@ -56,6 +58,10 @@ class PlayerRepositoryR2dbcImpl(
         userId: String
     ): Player? {
         return playerR2dbcRepository.findByGroupIdAndUserId(groupId, userId)?.toModel()
+    }
+
+    override suspend fun existsByGroupId(groupId: String): Boolean {
+        return playerR2dbcRepository.existsByGroupId(groupId)
     }
 
     override suspend fun existsByGroupIdAndUserId(groupId: String, userId: String): Boolean {
