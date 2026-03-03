@@ -8,24 +8,26 @@ import com.yareach.voting_tictactoe_system.player.proto.AllPlayerDeleteResult
 import com.yareach.voting_tictactoe_system.player.proto.GroupId
 import com.yareach.voting_tictactoe_system.player.proto.PlayerServiceGrpcKt
 import com.yareach.voting_tictactoe_system.player.proto.PlayersByTeam
-import com.yareach.voting_tictactoe_system.player.proto.RecruitAccepted
-import com.yareach.voting_tictactoe_system.player.proto.RecruitCompleted
 import com.yareach.voting_tictactoe_system.player.proto.RecruitRequestMessage
 import com.yareach.voting_tictactoe_system.player.proto.RecruitStreamMessage
 import com.yareach.voting_tictactoe_system.player.service.PlayerService
 import io.grpc.Status
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.springframework.grpc.server.service.GrpcService
 import kotlin.time.Duration.Companion.seconds
 
 @GrpcService
 class PlayerGrpcService(
-    private val playerService: PlayerService
+    private val playerService: PlayerService,
 ): PlayerServiceGrpcKt.PlayerServiceCoroutineImplBase() {
+
     override fun recruitPlayer(requests: Flow<RecruitRequestMessage>): Flow<RecruitStreamMessage> = flow {
         // クライアントの全てのＩＤを取得
         // 以後の作業の前提がクライアントからのユーザーＩＤ伝送の終わり
