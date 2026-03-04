@@ -13,6 +13,7 @@ import com.yareach.voting_tictactoe_system.player.proto.RecruitStreamMessage
 import com.yareach.voting_tictactoe_system.player.service.PlayerService
 import io.grpc.Status
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectIndexed
@@ -26,6 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 @GrpcService
 class PlayerGrpcService(
     private val playerService: PlayerService,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): PlayerServiceGrpcKt.PlayerServiceCoroutineImplBase() {
 
     override fun recruitPlayer(requests: Flow<RecruitRequestMessage>): Flow<RecruitStreamMessage> = flow {
@@ -92,11 +94,11 @@ class PlayerGrpcService(
         }
 
         emit(RecruitStreamMessageFactory.buildCompletedMessage(divideTeamResult.toResult()))
-    }
+    }.flowOn(dispatcher)
 
-    override suspend fun getUserIdsInGroup(request: GroupId): PlayersByTeam {
+    override suspend fun getUserIdsInGroup(request: GroupId): PlayersByTeam = withContext(dispatcher) {
         try {
-            return playerService.getPlayersByGroupId(request.groupId).toResult()
+            playerService.getPlayersByGroupId(request.groupId).toResult()
         } catch (apiException: ApiException) {
             when(apiException.errorCode) {
                 ErrorCode.GROUP_NOT_FOUND ->
@@ -110,7 +112,7 @@ class PlayerGrpcService(
         }
     }
 
-    override suspend fun deleteAllUserInGroupId(request: GroupId): AllPlayerDeleteResult {
+    override suspend fun deleteAllUserInGroupId(request: GroupId): AllPlayerDeleteResult = withContext(dispatcher) {
         val groupId = request.groupId
 
         try {
@@ -127,7 +129,7 @@ class PlayerGrpcService(
             }
         }
 
-        return AllPlayerDeleteResult.newBuilder()
+        AllPlayerDeleteResult.newBuilder()
             .setGroupId(groupId)
             .build()
     }
