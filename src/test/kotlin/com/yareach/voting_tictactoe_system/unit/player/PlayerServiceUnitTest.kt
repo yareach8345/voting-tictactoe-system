@@ -1,4 +1,4 @@
-package com.yareach.voting_tictactoe_system.unit
+package com.yareach.voting_tictactoe_system.unit.player
 
 import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.ErrorCode
@@ -101,7 +101,7 @@ class PlayerServiceUnitTest {
         fun getPlayersByGroupSuccessfully() = runTest {
             val groupId = "testGroup"
 
-            val players = List(6) { Player.new(groupId, "user-$it", if(it % 2 == 0) Team.X else Team.O ) }
+            val players = List(6) { Player.new(groupId, "user-$it", if (it % 2 == 0) Team.X else Team.O) }
 
             coEvery { playerRepositoryMock.existsByGroupId(groupId) }.returns(true)
 
@@ -182,7 +182,7 @@ class PlayerServiceUnitTest {
 
             coEvery { playerRepositoryMock.existsByGroupId(groupId) } returns false
 
-            val exception = assertThrows<ApiException>{ playerService.deleteAllPlayersByGroupId(groupId) }
+            val exception = assertThrows<ApiException> { playerService.deleteAllPlayersByGroupId(groupId) }
 
             assertEquals(ErrorCode.GROUP_NOT_FOUND, exception.errorCode)
         }

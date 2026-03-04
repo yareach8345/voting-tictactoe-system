@@ -1,4 +1,4 @@
-package com.yareach.voting_tictactoe_system.intergration
+package com.yareach.voting_tictactoe_system.intergration.player
 
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.player.grpc_service.PlayerGrpcService
@@ -149,7 +149,8 @@ class PlayerGrpcServiceTest {
                 assertEquals(numberOfPlayers / 2, lastMessage.completed.playersByTeam.userIdsInTeamXList.size)
                 assertEquals(numberOfPlayers / 2, lastMessage.completed.playersByTeam.userIdsInTeamOList.size)
 
-                val allPlayers = lastMessage.completed.playersByTeam.let { it.userIdsInTeamXList + it.userIdsInTeamOList }
+                val allPlayers =
+                    lastMessage.completed.playersByTeam.let { it.userIdsInTeamXList + it.userIdsInTeamOList }
                 assertEquals(numberOfPlayers, allPlayers.size)
                 assertEquals(List(numberOfPlayers) { "user-$it" }, allPlayers.sorted())
             }
@@ -172,7 +173,7 @@ class PlayerGrpcServiceTest {
             val outputStream = stub.recruitPlayer(inputFlow)
 
             launch {
-                val exception: StatusException = assertThrows{ outputStream.collect() }
+                val exception: StatusException = assertThrows { outputStream.collect() }
 
                 assertEquals(Status.DEADLINE_EXCEEDED.code, exception.status.code)
             }
@@ -194,7 +195,7 @@ class PlayerGrpcServiceTest {
             val outputStream = stub.recruitPlayer(inputFlow)
 
             launch {
-                val exception: StatusException = assertThrows{ outputStream.collect() }
+                val exception: StatusException = assertThrows { outputStream.collect() }
 
                 assertEquals(Status.INVALID_ARGUMENT.code, exception.status.code)
             }
@@ -221,7 +222,7 @@ class PlayerGrpcServiceTest {
             val outputStream = stub.recruitPlayer(inputFlow)
 
             launch {
-                val exception: StatusException = assertThrows{ outputStream.collect() }
+                val exception: StatusException = assertThrows { outputStream.collect() }
 
                 assertEquals(Status.INVALID_ARGUMENT.code, exception.status.code)
             }
@@ -236,7 +237,7 @@ class PlayerGrpcServiceTest {
         @DisplayName("[success case] groupIdを指定して特定のグループのプレイヤーのユーザーＩＤを取得")
         fun getUserIdSuccessfully() = runTest(testDispatcher) {
             List(6) {
-                Player.new("group1", "user-${it}", if(it % 2 == 0) Team.X else Team.O)
+                Player.new("group1", "user-${it}", if (it % 2 == 0) Team.X else Team.O)
             }.also { playerRepository.saveAll(it).collect() }
 
             val groupId = GroupId.newBuilder().setGroupId("group1").build()
@@ -272,7 +273,7 @@ class PlayerGrpcServiceTest {
         fun throwExceptionWhenPlayerInGroupIsNotExist() = runTest(testDispatcher) {
             val groupId = GroupId.newBuilder().setGroupId("group1").build()
 
-            val exception: StatusException = assertThrows{ stub.getUserIdsInGroup(groupId) }
+            val exception: StatusException = assertThrows { stub.getUserIdsInGroup(groupId) }
             assertEquals(Status.NOT_FOUND.code, exception.status.code)
         }
     }
@@ -285,7 +286,7 @@ class PlayerGrpcServiceTest {
         @DisplayName("[success case] groupIdで特定のグループのプレイヤーのデータを削除")
         fun deleteAllUsersSuccessfully() = runTest(testDispatcher) {
             List(6) {
-                Player.new("group1", "user-${it}", if(it % 2 == 0) Team.X else Team.O)
+                Player.new("group1", "user-${it}", if (it % 2 == 0) Team.X else Team.O)
             }.also { playerRepository.saveAll(it).collect() }
 
             val groupId = GroupId.newBuilder().setGroupId("group1").build()
@@ -301,7 +302,7 @@ class PlayerGrpcServiceTest {
         fun throwExceptionWhenPlayerInGroupIsNotExist() = runTest(testDispatcher) {
             val groupId = GroupId.newBuilder().setGroupId("group1").build()
 
-            val exception: StatusException = assertThrows{ stub.getUserIdsInGroup(groupId) }
+            val exception: StatusException = assertThrows { stub.getUserIdsInGroup(groupId) }
             assertEquals(Status.NOT_FOUND.code, exception.status.code)
         }
     }

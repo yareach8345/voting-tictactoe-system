@@ -1,4 +1,4 @@
-package com.yareach.voting_tictactoe_system.repository
+package com.yareach.voting_tictactoe_system.repository.player
 
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.player.model.Player
@@ -9,8 +9,7 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -58,9 +57,9 @@ class PlayerRepositoryTest {
 
                 assertNotNull(saveResult.id)
 
-                assertEquals(1, allPlayerInDb.size)
-                assertEquals("group1", allPlayerInDb.first().groupId)
-                assertEquals("user1", allPlayerInDb.first().userId)
+                Assertions.assertEquals(1, allPlayerInDb.size)
+                Assertions.assertEquals("group1", allPlayerInDb.first().groupId)
+                Assertions.assertEquals("user1", allPlayerInDb.first().userId)
             }
 
             @Test
@@ -72,9 +71,9 @@ class PlayerRepositoryTest {
 
                 val updateResult = playerRepository.save(saveResult)
 
-                assertEquals("group1", updateResult.groupId)
-                assertEquals("user1", updateResult.userId)
-                assertEquals(Team.O, updateResult.team)
+                Assertions.assertEquals("group1", updateResult.groupId)
+                Assertions.assertEquals("user1", updateResult.userId)
+                Assertions.assertEquals(Team.O, updateResult.team)
             }
         }
 
@@ -91,8 +90,8 @@ class PlayerRepositoryTest {
 
                 val findResult = playerRepository.findByGroupId("group1")
 
-                assertEquals(5, savedResult.count())
-                assertEquals(5, findResult.count())
+                Assertions.assertEquals(5, savedResult.count())
+                Assertions.assertEquals(5, findResult.count())
             }
         }
     }
@@ -112,7 +111,7 @@ class PlayerRepositoryTest {
 
                 val result = playerRepository.findByGroupId("group1").toList()
 
-                assertEquals(3, result.size)
+                Assertions.assertEquals(3, result.size)
             }
 
             @Test
@@ -132,13 +131,13 @@ class PlayerRepositoryTest {
             @DisplayName("[Success Case] groupIdとteamを条件にプレイヤーデータ取得")
             fun successCase() = runTest {
                 repeat(10) { i ->
-                    val team = if(i % 2 == 0) Team.O else Team.X
+                    val team = if (i % 2 == 0) Team.O else Team.X
                     playerRepository.save(Player(groupId = "group1", userId = "user$i", team = team))
                 }
 
                 val result = playerRepository.findByGroupIdAndTeam("group1", Team.O).toList()
 
-                assertEquals(5, result.size)
+                Assertions.assertEquals(5, result.size)
             }
 
             @Test
@@ -164,8 +163,8 @@ class PlayerRepositoryTest {
                 val result = playerRepository.findByGroupIdAndUserId("group1", "user1")
 
                 assertNotNull(result)
-                assertEquals("group1", result.groupId)
-                assertEquals("user1", result.userId)
+                Assertions.assertEquals("group1", result.groupId)
+                Assertions.assertEquals("user1", result.userId)
             }
 
             @Test
@@ -173,7 +172,7 @@ class PlayerRepositoryTest {
             fun whenMatchingDataIsNotExist() = runTest {
                 val result = playerRepository.findByGroupIdAndUserId("group1", "user1")
 
-                assertNull(result)
+                Assertions.assertNull(result)
             }
         }
     }
@@ -240,11 +239,19 @@ class PlayerRepositoryTest {
             @Test
             @DisplayName("[Success Case] 該当するプレイヤーのデータを削除し、削除したプレイヤーの数を返す")
             fun deletePlayersSuccessfully() = runTest {
-                repeat(3) { i -> playerRepository.save(Player.new(groupId = "group1", userId = "user$i", team = Team.O)) }
+                repeat(3) { i ->
+                    playerRepository.save(
+                        Player.new(
+                            groupId = "group1",
+                            userId = "user$i",
+                            team = Team.O
+                        )
+                    )
+                }
 
                 val result = playerRepository.deleteByGroupId("group1")
 
-                assertEquals(3, result)
+                Assertions.assertEquals(3, result)
             }
 
             @Test
@@ -252,7 +259,7 @@ class PlayerRepositoryTest {
             fun matchingPlayerIsNotExist() = runTest {
                 val result = playerRepository.deleteByGroupId("group1")
 
-                assertEquals(0, result)
+                Assertions.assertEquals(0, result)
             }
         }
 
@@ -267,7 +274,7 @@ class PlayerRepositoryTest {
 
                 val result = playerRepository.deleteByGroupIdAndUserId("group1", "user1")
 
-                assertEquals(1, result)
+                Assertions.assertEquals(1, result)
             }
 
             @Test
@@ -275,7 +282,7 @@ class PlayerRepositoryTest {
             fun whenMatchingDataIsNotExist() = runTest {
                 val result = playerRepository.deleteByGroupIdAndUserId("group1", "user1")
 
-                assertEquals(0, result)
+                Assertions.assertEquals(0, result)
             }
         }
     }
