@@ -3,6 +3,7 @@ package com.yareach.voting_tictactoe_system.unit.tictactoe
 import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.ErrorCode
 import com.yareach.voting_tictactoe_system.player.common.Team
+import com.yareach.voting_tictactoe_system.tictactoe.model.Cell
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeMove
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -14,19 +15,43 @@ import kotlin.test.assertEquals
 class TicTacToeMoveTest {
 
     @Nested
-    @DisplayName("Moveドメインモデル生成")
-    inner class GenerateTest {
+    @DisplayName("オブジェクト生成")
+    inner class GenerateMoveTest {
 
         @Test
-        @DisplayName("[Success case] TicTacToeMoveオブジェクトを生成")
-        fun generateSuccessFully() {
-            repeat(3) { y ->
-                repeat(3) { x ->
-                    val move = TicTacToeMove(y, x, Team.O)
+        @DisplayName("[Success case] CellとTeamで特定のセルへの着手を表すオブジェクトを生成")
+        fun generateSuccessfully() {
+            repeat(3) { x ->
+                repeat(3) { y ->
+                    val cell = Cell(x, y)
+                    val team = if(Random.nextBoolean()) Team.X else Team.O
 
-                    assertEquals(y, move.y)
+                    val move = TicTacToeMove(cell, team)
+
                     assertEquals(x, move.x)
-                    assertEquals(Team.O, move.team)
+                    assertEquals(y, move.y)
+                    assertEquals(team, move.team)
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("withCoordinate Factoryメソッドを用いてオブジェクトを生成")
+    inner class GenerateWithFactoryMethodTest {
+
+        @Test
+        @DisplayName("[Success case] オブジェクト生成成功")
+        fun generateSuccessFully() {
+            repeat(3) { x ->
+                repeat(3) { y ->
+                    val team = if(Random.nextBoolean()) Team.X else Team.O
+
+                    val move = TicTacToeMove.withCoordinate(x, y, team)
+
+                    assertEquals(x, move.x)
+                    assertEquals(y, move.y)
+                    assertEquals(team, move.team)
                 }
             }
         }
@@ -34,23 +59,16 @@ class TicTacToeMoveTest {
         @Test
         @DisplayName("[Fail case] xとyは0〜2の範囲内でなければならない")
         fun outOfBoardTest() {
-            val team = if(Random.nextBoolean()) Team.X else Team.O
+            listOf(-1, 0, 3).flatMap { x ->
+                listOf(-1, 0, 3).map { y-> x to y }
+            }.filterNot {
+                Cell.isEnable(it.first, it.second)
+            }.forEach { (x, y) ->
+                val team = if(Random.nextBoolean()) Team.X else Team.O
 
-            // y < 0 の場合
-            assertThrows<ApiException>{ TicTacToeMove(-1, 0, team) }
-                .also { assertEquals(ErrorCode.OUT_OF_BOARD, it.errorCode) }
-
-            // y > 2 の場合
-            assertThrows<ApiException>{ TicTacToeMove(3, 0, team) }
-                .also { assertEquals(ErrorCode.OUT_OF_BOARD, it.errorCode) }
-
-            // x < 0 の場合
-            assertThrows<ApiException>{ TicTacToeMove(0, -1, team) }
-                .also { assertEquals(ErrorCode.OUT_OF_BOARD, it.errorCode) }
-
-            // x > 2 の場合
-            assertThrows<ApiException>{ TicTacToeMove(0, 3, team) }
-                .also { assertEquals(ErrorCode.OUT_OF_BOARD, it.errorCode) }
+                assertThrows<ApiException>{ TicTacToeMove.withCoordinate(x, y, team) }
+                    .also { assertEquals(ErrorCode.OUT_OF_BOARD, it.errorCode) }
+            }
         }
     }
 }
