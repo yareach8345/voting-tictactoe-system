@@ -1,7 +1,5 @@
 package com.yareach.voting_tictactoe_system.tictactoe.model
 
-import com.yareach.voting_tictactoe_system.common.error.ApiException
-import com.yareach.voting_tictactoe_system.common.error.ErrorCode
 import com.yareach.voting_tictactoe_system.player.common.Team
 
 enum class TicTacToeGameState{
@@ -95,4 +93,16 @@ class TicTacToeGameNormalModeImpl(
 
     override val effectiveMoves: List<TicTacToeMove>
         get() = moves.toList()
+}
+
+class TicTacToeGameInfinityModeImpl(
+    moves: List<TicTacToeMove> = listOf()
+): TicTacToeGame(moves) {
+
+    init {
+        require(moves.windowed(6).none{ it.hasDuplicateCell() }) { "Moves must not contain duplicate cells within any 6 moves" }
+    }
+
+    override val effectiveMoves: List<TicTacToeMove>
+        get() = moves.takeLast(6)
 }
