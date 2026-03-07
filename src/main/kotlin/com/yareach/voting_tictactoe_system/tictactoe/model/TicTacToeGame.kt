@@ -77,8 +77,8 @@ abstract class TicTacToeGame(
     }
 
     fun move(cell: Cell) {
-        if(gameState != TicTacToeGameState.IN_PROGRESS) throw ApiException(ErrorCode.GAME_IS_ENDED, "The game is already ended")
-        if(effectiveMoves.any { it.x == cell.x && it.y == cell.y }) throw ApiException(ErrorCode.ALREADY_OCCUPIED_CELL, "cell (x=${cell.x}, y=${cell.y}) is already occupied")
+        require(gameState == TicTacToeGameState.IN_PROGRESS) { "The game is already finished" }
+        require(effectiveMoves.none { it.x == cell.x && it.y == cell.y }) { "cell (x=${cell.x}, y=${cell.y}) is already occupied" }
 
         _moves.add(TicTacToeMove(cell, currentTeam))
     }

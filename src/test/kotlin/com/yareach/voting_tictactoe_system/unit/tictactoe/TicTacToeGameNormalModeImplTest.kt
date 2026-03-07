@@ -3,6 +3,7 @@ package com.yareach.voting_tictactoe_system.unit.tictactoe
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.tictactoe.model.Cell
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameNormalModeImpl
+import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameState
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeMove
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -121,6 +122,79 @@ class TicTacToeGameNormalModeImplTest {
     }
 
     @Nested
+    @DisplayName("gameStateテスト")
+    inner class GameStateTest {
+
+        @Test
+        @DisplayName("ゲームが進行中である場合、IN_PROGRESS状態になる")
+        fun shouldBeInProgress() {
+            val sampleMoves = listOf(
+                TicTacToeMove.withCoordinate(0, 0, Team.X),
+                TicTacToeMove.withCoordinate(1, 1, Team.O),
+            )
+
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
+
+            assertEquals(TicTacToeGameState.IN_PROGRESS, game.gameState)
+        }
+
+        @Test
+        @DisplayName("ゲームがXの勝利で終わった場合、X_WON状態になる")
+        fun shouldBeXWon() {
+            val sampleMoves = listOf(
+                TicTacToeMove.withCoordinate(0, 0, Team.X),
+                TicTacToeMove.withCoordinate(0, 1, Team.O),
+                TicTacToeMove.withCoordinate(1, 1, Team.X),
+                TicTacToeMove.withCoordinate(0, 2, Team.O),
+                TicTacToeMove.withCoordinate(2, 2, Team.X),
+            )
+
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
+
+            assertEquals(TicTacToeGameState.X_WON, game.gameState)
+        }
+
+        @Test
+        @DisplayName("ゲームがOの勝利で終わった場合、O_WON状態になる")
+        fun shouldBeOWon() {
+            val sampleMoves = listOf(
+                TicTacToeMove.withCoordinate(1, 0, Team.X),
+                TicTacToeMove.withCoordinate(0, 0, Team.O),
+                TicTacToeMove.withCoordinate(0, 1, Team.X),
+                TicTacToeMove.withCoordinate(1, 1, Team.O),
+                TicTacToeMove.withCoordinate(0, 2, Team.X),
+                TicTacToeMove.withCoordinate(2, 2, Team.O),
+            )
+
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
+
+            assertEquals(TicTacToeGameState.O_WON, game.gameState)
+        }
+
+        @Test
+        @DisplayName("勝利なく9つのセルが埋まった場合、DRAW状態になる")
+        fun shouldBeDraw() {
+            val sampleMoves = listOf(
+                TicTacToeMove.withCoordinate(0, 0, Team.X),
+                TicTacToeMove.withCoordinate(1, 0, Team.O),
+                TicTacToeMove.withCoordinate(2, 2, Team.X),
+
+                TicTacToeMove.withCoordinate(1, 1, Team.O),
+                TicTacToeMove.withCoordinate(1, 2, Team.X),
+                TicTacToeMove.withCoordinate(2, 0, Team.O),
+
+                TicTacToeMove.withCoordinate(0, 2, Team.X),
+                TicTacToeMove.withCoordinate(2, 1, Team.O),
+                TicTacToeMove.withCoordinate(0, 1, Team.X),
+            )
+
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
+
+            assertEquals(TicTacToeGameState.DRAW, game.gameState)
+        }
+    }
+
+    @Nested
     @DisplayName("moveテスト")
     inner class MoveTest {
         val sampleMoves = listOf(
@@ -146,7 +220,7 @@ class TicTacToeGameNormalModeImplTest {
         }
 
         @Test
-        @DisplayName("xとyの値を持って着手を記録する")
+        @DisplayName("xとyの指定して着手を記録する")
         fun moveSuccessfulWithXAndY() {
 
             game.move(2, 2)
@@ -158,6 +232,32 @@ class TicTacToeGameNormalModeImplTest {
             assertEquals(sampleMoves, game.moves.dropLast(2))
             assertEquals(TicTacToeMove.withCoordinate(2, 2, Team.X), lastTwoMoves[0])
             assertEquals(TicTacToeMove.withCoordinate(0, 1, Team.O), lastTwoMoves[1])
+        }
+
+        @Test
+        @DisplayName("もう着手したセルに再び着手すればエラー発生")
+        fun occupiedTest() {
+            val exception = assertThrows<IllegalArgumentException> { game.move(1, 1) }
+
+            assertEquals("cell (x=1, y=1) is already occupied", exception.message)
+        }
+
+        @Test
+        @DisplayName("ゲーム終了後に着手するとエラー発生")
+        fun whenGameStateIsNotInProgress() {
+            val sampleMoves = listOf(
+                TicTacToeMove.withCoordinate(0, 0, Team.X),
+                TicTacToeMove.withCoordinate(0, 1, Team.O),
+                TicTacToeMove.withCoordinate(1, 1, Team.X),
+                TicTacToeMove.withCoordinate(0, 2, Team.O),
+                TicTacToeMove.withCoordinate(2, 2, Team.X),
+            )
+
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
+
+            val exception = assertThrows<IllegalArgumentException> { game.move(1, 0) }
+
+            assertEquals("The game is already finished", exception.message)
         }
     }
 }
