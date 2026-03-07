@@ -11,6 +11,8 @@ enum class ErrorCode(
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "Group not found.", "GROUP_NOT_FOUND"),
 
     OUT_OF_BOARD(HttpStatus.CONFLICT, "Coordinates must be between 0 and 2.", "OUT_OF_BOARD"),
+    ALREADY_OCCUPIED_CELL(HttpStatus.CONFLICT, "The cell is already occupied.", "ALREADY_OCCUPIED_CELL"),
+    GAME_IS_ENDED(HttpStatus.CONFLICT, "Game is ended", "GAME_IS_ENDED"),
 
     INTERNAL(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error.", "INTERNAL"),
 }
