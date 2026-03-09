@@ -13,7 +13,7 @@ enum class TicTacToeGameState{
     }
 }
 
-fun List<TicTacToeMove>.hasDuplicateCell() = distinctBy { it.y to it.x }.size != size
+fun List<TicTacToeMove>.hasDuplicateCell() = distinctBy { it.cell }.size != size
 
 fun List<TicTacToeMove>.hasAlternatingTeams() = zipWithNext().all { it.first.team != it.second.team }
 
@@ -100,7 +100,7 @@ class TicTacToeGameInfinityModeImpl(
 ): TicTacToeGame(moves) {
 
     init {
-        require(moves.windowed(6).none{ it.hasDuplicateCell() }) { "Moves must not contain duplicate cells within any 6 moves" }
+        require(moves.windowed(6, partialWindows = true).none{ it.hasDuplicateCell() }) { "Moves must not contain duplicate cells within any 6 moves" }
     }
 
     override val effectiveMoves: List<TicTacToeMove>
