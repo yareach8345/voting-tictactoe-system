@@ -7,6 +7,8 @@ create table if not exists game_group_info(
     id int primary key auto_increment,
     group_id varchar(255) not null unique,
     game_type enum('NORMAL','INFINITY') not null default 'NORMAL',
+    state enum('GENERATED', 'RECRUITING', 'BEFORE_START', 'PLAYING', 'FINISHED') not null default 'GENERATED',
+    last_updated timestamp default current_timestamp on update current_timestamp,
 
     unique index group_idx(group_id)
 );

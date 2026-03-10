@@ -6,7 +6,9 @@ drop table if exists game_group_info;
 create table if not exists game_group_info(
     id int primary key auto_increment,
     group_id varchar(255) not null unique,
-    game_type varchar(10) not null default 'NORMAL' check(game_type in ('NORMAL','INFINITY'))
+    game_type varchar(10) not null default 'NORMAL' check(game_type in ('NORMAL','INFINITY')),
+    state varchar(10) not null default 'GENERATED' check(state in ('GENERATED', 'RECRUITING', 'BEFORE_START', 'PLAYING', 'FINISHED')),
+    last_updated timestamp default current_timestamp on update current_timestamp
 );
 
 create unique index game_group_info_group_idx on game_group_info(group_id);

@@ -1,6 +1,7 @@
 package com.yareach.voting_tictactoe_system.game_group_info.repository
 
 import com.yareach.voting_tictactoe_system.game_group_info.entity.GameGroupInfoR2dbcEntity
+import com.yareach.voting_tictactoe_system.game_group_info.enum.GameState
 import com.yareach.voting_tictactoe_system.game_group_info.model.GameGroupInfo
 import org.springframework.stereotype.Repository
 
@@ -12,6 +13,10 @@ interface GameGroupInfoRepository {
     suspend fun existsByGroupId(groupId: String): Boolean
 
     suspend fun deleteByGroupId(groupId: String): Long
+
+    suspend fun updateGameState(group: String, newState: GameState)
+
+    suspend fun updateLastUpdatedToNow(groupId: String)
 }
 
 @Repository
@@ -35,4 +40,11 @@ class GameGroupInfoRepositoryR2dbcImpl(
         return r2dbcRepository.deleteByGroupId(groupId)
     }
 
+    override suspend fun updateGameState(group: String, newState: GameState) {
+        r2dbcRepository.updateState(group, newState)
+    }
+
+    override suspend fun updateLastUpdatedToNow(groupId: String) {
+        return r2dbcRepository.updateLastUpdatedToNow(groupId)
+    }
 }
