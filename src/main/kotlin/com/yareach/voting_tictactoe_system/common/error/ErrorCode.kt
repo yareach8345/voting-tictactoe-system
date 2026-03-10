@@ -7,6 +7,8 @@ enum class ErrorCode(
     val message: String,
     val errorCode: String
 ) {
+    GAME_INFO_NOTFOUND(HttpStatus.NOT_FOUND, "Game info not found", "Game info not found"),
+
     NOT_ENOUGH_PLAYERS(HttpStatus.UNPROCESSABLE_ENTITY, "Not enough players to start the game.", "NOT_ENOUGH_PLAYERS"),
     GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "Group not found.", "GROUP_NOT_FOUND"),
 
