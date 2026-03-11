@@ -5,7 +5,7 @@ import com.yareach.voting_tictactoe_system.game_group_info.model.GameGroupInfo
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoR2dbcRepository
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoRepository
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoRepositoryR2dbcImpl
-import com.yareach.voting_tictactoe_system.tictactoe.enum.GameType
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

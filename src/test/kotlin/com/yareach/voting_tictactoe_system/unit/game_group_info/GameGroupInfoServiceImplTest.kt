@@ -7,7 +7,7 @@ import com.yareach.voting_tictactoe_system.game_group_info.model.GameGroupInfo
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoRepository
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoService
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoServiceImpl
-import com.yareach.voting_tictactoe_system.tictactoe.enum.GameType
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

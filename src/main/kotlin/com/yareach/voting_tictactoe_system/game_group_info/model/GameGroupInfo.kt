@@ -1,7 +1,7 @@
 package com.yareach.voting_tictactoe_system.game_group_info.model
 
 import com.yareach.voting_tictactoe_system.game_group_info.enum.GameState
-import com.yareach.voting_tictactoe_system.tictactoe.enum.GameType
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import java.time.LocalDateTime
 
 class GameGroupInfo(

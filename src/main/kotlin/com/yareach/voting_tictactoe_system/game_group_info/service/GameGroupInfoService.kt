@@ -5,7 +5,7 @@ import com.yareach.voting_tictactoe_system.common.error.ErrorCode
 import com.yareach.voting_tictactoe_system.game_group_info.enum.GameState
 import com.yareach.voting_tictactoe_system.game_group_info.model.GameGroupInfo
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoRepository
-import com.yareach.voting_tictactoe_system.tictactoe.enum.GameType
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
