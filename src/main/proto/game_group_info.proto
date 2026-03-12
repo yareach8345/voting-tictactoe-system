@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.yareach.voting_tictactoe_system.game_group_info.proto";
+option java_outer_classname = "GameGroupInfoProto";
+
+service GameGroupInfoService {
+  rpc addGameInfo(AddGameInfoMessage) returns (GroupIdMessage) {};
+
+  rpc deleteGameInfo(GroupIdMessage) returns (GroupIdMessage) {};
+
+  rpc getGameState(GroupIdMessage) returns (GroupInfoStatePair) {};
+
+  rpc isExistsByGroupId(GroupIdMessage) returns (CheckGameInfoExistenceResponseMessage) {}
+}
+
+enum GameType {
+  NORMAL = 0;
+  INFINITY = 1;
+}
+
+enum GameState {
+    GENERATED = 0;
+    RECRUITING = 1;
+    BEFORE_START = 2;
+    PLAYING = 3;
+    FINISHED = 4;
+}
+
+message AddGameInfoMessage {
+  string groupId = 1;
+  GameType gameType = 2;
+}
+
+message CheckGameInfoExistenceResponseMessage {
+  string groupId = 1;
+  bool isExist = 2;
+}
+
+message GroupInfoStatePair {
+  string groupId = 1;
+  GameState state = 2;
+}
+
+message GroupIdMessage {
+  string groupId = 1;
+}

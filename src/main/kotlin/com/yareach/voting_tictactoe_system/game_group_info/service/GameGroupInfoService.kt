@@ -18,7 +18,7 @@ interface GameGroupInfoService {
 
     suspend fun deleteGameGroupInfo(groupId: String)
 
-    suspend fun updateGameState(groupId: String, state: GameState): GameGroupInfo
+    suspend fun updateGameState(groupId: String, newState: GameState): GameGroupInfo
 
     suspend fun updateLastUpdated(groupId: String): GameGroupInfo
 }
@@ -59,12 +59,12 @@ class GameGroupInfoServiceImpl(
 
     override suspend fun updateGameState(
         groupId: String,
-        state: GameState
+        newState: GameState
     ): GameGroupInfo {
         val gameInfo = gameGroupInfoRepository.findByGroupId(groupId)
             ?: throw ApiException(ErrorCode.GAME_INFO_NOTFOUND, "Game info not found with groupId: $groupId")
 
-        gameInfo.state = state
+        gameInfo.changeState(newState)
 
         return gameGroupInfoRepository.save(gameInfo)
     }
