@@ -1,21 +1,22 @@
 package com.yareach.voting_tictactoe_system.common.error
 
-import org.springframework.http.HttpStatus
+import io.grpc.Status
 
 enum class ErrorCode(
-    val state: HttpStatus,
+    val state: Status,
     val message: String,
     val errorCode: String
 ) {
-    GAME_INFO_NOTFOUND(HttpStatus.NOT_FOUND, "Game info not found", "Game info not found"),
-    GROUP_ID_DUPLICATE(HttpStatus.BAD_REQUEST, "Duplicate group id", "Duplicate group id"),
+    GAME_INFO_NOTFOUND(Status.NOT_FOUND, "Game info not found", "GAME_INFO_NOT_FOUND"),
+    GROUP_ID_DUPLICATE(Status.INVALID_ARGUMENT, "Duplicate group id", "DUPLICATE_GROUP_ID"),
 
-    NOT_ENOUGH_PLAYERS(HttpStatus.UNPROCESSABLE_ENTITY, "Not enough players to start the game.", "NOT_ENOUGH_PLAYERS"),
-    GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "Group not found.", "GROUP_NOT_FOUND"),
+    NOT_ENOUGH_PLAYERS(Status.INTERNAL, "Not enough players to start the game.", "NOT_ENOUGH_PLAYERS"),
+    INVALID_GROUP_ID(Status.NOT_FOUND, "Group not found.", "INVALID_GROUP_ID"),
+    PLAYER_RECRUIT_TIMEOUT(Status.DEADLINE_EXCEEDED, "Player recruit timeout.", "PLAYER_RECRUIT_TIMEOUT"),
 
-    OUT_OF_BOARD(HttpStatus.CONFLICT, "Coordinates must be between 0 and 2.", "OUT_OF_BOARD"),
-    ALREADY_OCCUPIED_CELL(HttpStatus.CONFLICT, "The cell is already occupied.", "ALREADY_OCCUPIED_CELL"),
-    GAME_IS_ENDED(HttpStatus.CONFLICT, "Game is ended", "GAME_IS_ENDED"),
+    OUT_OF_BOARD(Status.OUT_OF_RANGE, "Coordinates must be between 0 and 2.", "OUT_OF_BOARD"),
 
-    INTERNAL(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error.", "INTERNAL"),
+    WRONG_MESSAGE_ORDER(Status.INVALID_ARGUMENT, "Wrong message order", "WRONG_MESSAGE_ORDER"),
+
+    INTERNAL_ERROR(Status.INTERNAL, "Internal error", "INTERNAL ERROR"),
 }
