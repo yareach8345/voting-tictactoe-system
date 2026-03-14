@@ -1,8 +1,10 @@
 package com.yareach.voting_tictactoe_system.player.message
 
+import com.yareach.voting_tictactoe_system.player.dto.PlayersByTeamDto
 import com.yareach.voting_tictactoe_system.player.proto.PlayersByTeam
 import com.yareach.voting_tictactoe_system.player.proto.RecruitAccepted
 import com.yareach.voting_tictactoe_system.player.proto.RecruitCompleted
+import com.yareach.voting_tictactoe_system.player.proto.RecruitRejected
 import com.yareach.voting_tictactoe_system.player.proto.RecruitStreamMessage
 
 object RecruitStreamMessageFactory {
@@ -18,7 +20,24 @@ object RecruitStreamMessageFactory {
         return streamMessage
     }
 
-    fun buildCompletedMessage(playersByTeam: PlayersByTeam): RecruitStreamMessage {
+    fun buildRejectedMessage(userId: String): RecruitStreamMessage {
+        val rejected = RecruitRejected.newBuilder()
+            .setUserId(userId)
+            .build()
+
+        val streamMessage = RecruitStreamMessage.newBuilder()
+            .setRejected(rejected)
+            .build()
+
+        return streamMessage
+    }
+
+    fun buildCompletedMessage(playersByTeamDto: PlayersByTeamDto): RecruitStreamMessage {
+        val playersByTeam = PlayersByTeam.newBuilder()
+            .addAllUserIdsInTeamX(playersByTeamDto.userIdsInTeamX)
+            .addAllUserIdsInTeamO(playersByTeamDto.userIdsInTeamO)
+            .build()
+
         val completed = RecruitCompleted.newBuilder()
             .setPlayersByTeam(playersByTeam)
             .build()

@@ -42,7 +42,6 @@ class PlayerServiceImpl(
 ): PlayerService {
 
     override fun processRecruitMessage(recruitMessage: Flow<RecruitRequestDto>): Flow<RecruitResponseDto> = flow {
-
         // クライアントの全てのＩＤを取得
         // 以後の作業の前提がクライアントからのユーザーＩＤ伝送の終わり
         val (groupId, setOfUserId) = try {
@@ -98,6 +97,7 @@ class PlayerServiceImpl(
         val players =
             divideTeamResult.userIdsInTeamX.map { userIds -> Player.new(groupId, userIds, Team.X) } +
             divideTeamResult.userIdsInTeamO.map { userIds -> Player.new(groupId, userIds, Team.O) }
+
         playerRepository.saveAll(players).collect()
 
         emit(RecruitCompleted(divideTeamResult))

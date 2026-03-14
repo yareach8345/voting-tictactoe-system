@@ -31,6 +31,10 @@ message RecruitAccepted {
   string userId = 1;
 }
 
+message RecruitRejected {
+  string userId = 1;
+}
+
 message PlayersByTeam {
   repeated string userIdsInTeamX = 1;
   repeated string userIdsInTeamO = 2;
@@ -43,7 +47,8 @@ message RecruitCompleted {
 message RecruitStreamMessage {
   oneof payload {
     RecruitAccepted accepted = 1;
-    RecruitCompleted completed = 2;
+    RecruitRejected rejected = 2;
+    RecruitCompleted completed = 3;
   }
 }
 
