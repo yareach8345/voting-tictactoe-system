@@ -25,7 +25,7 @@ create table if not exists player(
     user_id varchar(255) not null,
     team VARCHAR(1) check (team in ('O', 'X')),
 
-    foreign key(group_id) references game_group_info(group_id)
+    foreign key(group_id) references game_group_info(group_id) on delete cascade
 );
 
 create unique index player_group_user_idx on player(group_id, user_id);
