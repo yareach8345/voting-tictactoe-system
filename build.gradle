@@ -30,9 +30,9 @@ dependencies {
     implementation 'io.asyncer:r2dbc-mysql'
     implementation 'org.springframework.boot:spring-boot-starter-webclient'
     implementation 'io.grpc:grpc-services'
-    implementation "io.grpc:grpc-kotlin-stub"
-    implementation "io.grpc:grpc-protobuf"
-    implementation "com.google.protobuf:protobuf-kotlin"
+    implementation 'io.grpc:grpc-kotlin-stub'
+    implementation 'io.grpc:grpc-protobuf'
+    implementation 'com.google.protobuf:protobuf-kotlin'
     implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
