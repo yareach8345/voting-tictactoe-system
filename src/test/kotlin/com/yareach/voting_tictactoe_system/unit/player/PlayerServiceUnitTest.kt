@@ -211,7 +211,7 @@ class PlayerServiceUnitTest {
         }
 
         @Test
-        @DisplayName("[Fail case]")
+        @DisplayName("[Fail case] タイムアウト発生")
         fun timeTest() = runTest {
             val userIds = List(10) { "testUser$it" }
             val inputFlow = flow {
