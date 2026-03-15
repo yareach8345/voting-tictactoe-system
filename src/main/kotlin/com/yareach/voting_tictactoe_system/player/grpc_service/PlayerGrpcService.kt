@@ -1,6 +1,5 @@
 package com.yareach.voting_tictactoe_system.player.grpc_service
 
-import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.catchApiException
 import com.yareach.voting_tictactoe_system.common.error.withCatchingApiException
 import com.yareach.voting_tictactoe_system.player.dto.toResult
