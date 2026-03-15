@@ -6,6 +6,10 @@ spring:
     init:
       mode: always
       schema-locations: sql/test-schema-init.sql
+  output:
+    ansi:
+      enabled: always
 logging:
   level:
     org.springframework.r2dbc.core: debug
+    com.yareach.voting_tictactoe_system: debug

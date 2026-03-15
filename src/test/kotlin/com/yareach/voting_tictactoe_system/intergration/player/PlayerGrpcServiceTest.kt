@@ -1,6 +1,7 @@
 package com.yareach.voting_tictactoe_system.intergration.player
 
 import com.yareach.voting_tictactoe_system.common.enum.GameType
+import com.yareach.voting_tictactoe_system.common.extension.logger
 import com.yareach.voting_tictactoe_system.game_group_info.repository.GameGroupInfoR2dbcRepository
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoService
 import com.yareach.voting_tictactoe_system.player.common.Team
@@ -73,11 +74,14 @@ class PlayerGrpcServiceTest {
     private lateinit var server: Server
     private lateinit var channel: ManagedChannel
 
+    // logger
+    private val logger = logger()
+
     // stub
 
     @BeforeEach
     fun setupStub() {
-        playerService = PlayerServiceImpl(playerRepository, gameGroupInfoService)
+        playerService = PlayerServiceImpl(playerRepository, gameGroupInfoService, testDispatcher)
 
         playerGrpcService = PlayerGrpcService(playerService)
 
@@ -188,29 +192,30 @@ class PlayerGrpcServiceTest {
             }
         }
 
-        // timeout テストコード作成方法調査必要
-//        @Test
-//        @DisplayName("[Fail case] タイムアウト発生")
-//        fun whenOccursTimeout() = runTest(testDispatcher) {
-//
-//            val numberOfPlayers = 10
-//
-//            val inputFlow = flow {
-//                emit(generateRecruitInitMessage(testGroupId))
-//                repeat(numberOfPlayers) { index ->
-//                    delay(10.seconds)
-//                    emit(generateAddNewPlayerMessage("user-$index"))
-//                }
-//            }
-//
-//            val outputStream = stub.recruitPlayer(inputFlow)
-//
-//            launch {
-//                val exception: StatusException = assertThrows { outputStream.collect() }
-//
-//                assertEquals(Status.DEADLINE_EXCEEDED.code, exception.status.code)
-//            }
-//        }
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        @DisplayName("[Fail case] タイムアウト発生")
+        fun whenOccursTimeout() = runTest(testDispatcher) {
+
+            val numberOfPlayers = 10
+
+            val inputFlow = flow {
+                emit(generateRecruitInitMessage(testGroupId))
+                repeat(numberOfPlayers) { index ->
+                    delay(10.seconds)
+                    emit(generateAddNewPlayerMessage("user-$index"))
+                    logger.info("add player user-$index, currentTime : $currentTime")
+                }
+            }
+
+            val outputStream = stub.recruitPlayer(inputFlow)
+
+            launch {
+                val exception: StatusException = assertThrows { outputStream.collect() }
+
+                assertEquals(Status.DEADLINE_EXCEEDED.code, exception.status.code)
+            }
+        }
 
         @Test
         @DisplayName("[Fail case] Message Sequence Error - Initデータ未送信")

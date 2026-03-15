@@ -3,6 +3,7 @@ package com.yareach.voting_tictactoe_system.player.service
 import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.ErrorCode
 import com.yareach.voting_tictactoe_system.common.extension.doFirst
+import com.yareach.voting_tictactoe_system.common.extension.logger
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoService
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.player.dto.AddNewPlayerDto
@@ -15,10 +16,13 @@ import com.yareach.voting_tictactoe_system.player.dto.RecruitRequestDto
 import com.yareach.voting_tictactoe_system.player.dto.RecruitResponseDto
 import com.yareach.voting_tictactoe_system.player.model.Player
 import com.yareach.voting_tictactoe_system.player.repository.PlayerRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withTimeout
 import org.springframework.stereotype.Service
@@ -39,7 +43,10 @@ interface PlayerService {
 class PlayerServiceImpl(
     private val playerRepository: PlayerRepository,
     private val gameGroupInfoService: GameGroupInfoService,
+    private val dispatcher: CoroutineDispatcher? = null
 ): PlayerService {
+
+    private val logger = logger()
 
     override fun processRecruitMessage(recruitMessage: Flow<RecruitRequestDto>): Flow<RecruitResponseDto> = flow {
         // クライアントの全てのＩＤを取得
@@ -84,8 +91,9 @@ class PlayerServiceImpl(
 
                 Pair(groupId, setOfUserId)
             }
-        } catch (_: TimeoutCancellationException) {
-            throw ApiException(ErrorCode.PLAYER_RECRUIT_TIMEOUT, "Recruitment was not completed on time")
+        } catch (e: TimeoutCancellationException) {
+            logger.debug("Timeout while waiting for recruit message")
+            throw e
         }
 
         if (setOfUserId.size < 2) {
@@ -101,6 +109,18 @@ class PlayerServiceImpl(
         playerRepository.saveAll(players).collect()
 
         emit(RecruitCompleted(divideTeamResult))
+    }.catch {
+        when(it) {
+            is TimeoutCancellationException -> throw ApiException(ErrorCode.PLAYER_RECRUIT_TIMEOUT, "Recruitment was not completed on time")
+            else -> throw it
+        }
+    }.let {
+        if(dispatcher != null) {
+            logger.debug("with custom dispatcher {}", dispatcher)
+            it.flowOn(dispatcher)
+        } else {
+            it
+        }
     }
 
     private fun divideTeam(userIds: Set<String>): PlayersByTeamDto {
