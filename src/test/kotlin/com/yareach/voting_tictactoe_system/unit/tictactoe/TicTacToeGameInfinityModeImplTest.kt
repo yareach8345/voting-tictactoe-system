@@ -1,5 +1,6 @@
 package com.yareach.voting_tictactoe_system.unit.tictactoe
 
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.tictactoe.model.Cell
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameInfinityModeImpl
@@ -30,6 +31,7 @@ class TicTacToeGameInfinityModeImplTest {
 
             val game = TicTacToeGameInfinityModeImpl(moves)
 
+            assertEquals(GameType.INFINITY, game.gameType)
             assertEquals(Team.X, game.currentTeam)
             assertEquals(5, game.currentTurnNumber)
             assertTrue(moves.zip(game.moves).any { it.first == it.second })
@@ -40,6 +42,7 @@ class TicTacToeGameInfinityModeImplTest {
         fun generateTicTacToeGameWithEmptyList() {
             val game = TicTacToeGameInfinityModeImpl(listOf())
 
+            assertEquals(GameType.INFINITY, game.gameType)
             assertEquals(Team.X, game.currentTeam)
             assertEquals(1, game.currentTurnNumber)
             assertTrue(game.moves.isEmpty())

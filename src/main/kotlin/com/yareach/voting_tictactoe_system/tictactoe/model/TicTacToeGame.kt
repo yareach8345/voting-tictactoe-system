@@ -1,5 +1,6 @@
 package com.yareach.voting_tictactoe_system.tictactoe.model
 
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import com.yareach.voting_tictactoe_system.player.common.Team
 
 enum class TicTacToeGameState{
@@ -18,6 +19,7 @@ fun List<TicTacToeMove>.hasDuplicateCell() = distinctBy { it.cell }.size != size
 fun List<TicTacToeMove>.hasAlternatingTeams() = zipWithNext().all { it.first.team != it.second.team }
 
 abstract class TicTacToeGame(
+    val gameType: GameType,
     initMoves: List<TicTacToeMove>,
 ) {
     init {
@@ -84,7 +86,7 @@ abstract class TicTacToeGame(
 
 class TicTacToeGameNormalModeImpl(
     moves: List<TicTacToeMove> = listOf()
-): TicTacToeGame(moves) {
+): TicTacToeGame(GameType.NORMAL, moves) {
 
     init {
         require(moves.size <= 9) { "There must be at least 9 moves" }
@@ -97,7 +99,7 @@ class TicTacToeGameNormalModeImpl(
 
 class TicTacToeGameInfinityModeImpl(
     moves: List<TicTacToeMove> = listOf()
-): TicTacToeGame(moves) {
+): TicTacToeGame(GameType.INFINITY, moves) {
 
     init {
         require(moves.windowed(6, partialWindows = true).none{ it.hasDuplicateCell() }) { "Moves must not contain duplicate cells within any 6 moves" }
