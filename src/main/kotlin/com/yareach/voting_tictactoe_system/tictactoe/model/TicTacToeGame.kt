@@ -22,6 +22,14 @@ abstract class TicTacToeGame(
     val gameType: GameType,
     initMoves: List<TicTacToeMove>,
 ) {
+    companion object {
+
+        fun from(gameType: GameType, moves: List<TicTacToeMove> = listOf()) = when(gameType){
+            GameType.NORMAL -> TicTacToeGameNormalModeImpl(moves)
+            GameType.INFINITY -> TicTacToeGameInfinityModeImpl(moves)
+        }
+    }
+
     init {
         if(initMoves.isNotEmpty()) { require(initMoves.first().team == Team.X ) { "First team must be X" } }
         require(initMoves.hasAlternatingTeams()) { "Team must alternate turns" }

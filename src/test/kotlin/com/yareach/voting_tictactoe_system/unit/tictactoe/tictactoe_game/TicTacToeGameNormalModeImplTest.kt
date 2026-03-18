@@ -1,19 +1,20 @@
-package com.yareach.voting_tictactoe_system.unit.tictactoe
+package com.yareach.voting_tictactoe_system.unit.tictactoe.tictactoe_game
 
 import com.yareach.voting_tictactoe_system.common.enum.GameType
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.tictactoe.model.Cell
-import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameInfinityModeImpl
+import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameNormalModeImpl
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeGameState
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeMove
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.assertThrows
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class TicTacToeGameInfinityModeImplTest {
+class TicTacToeGameNormalModeImplTest {
 
     @Nested
     @DisplayName("オブジェクト生成テスト")
@@ -29,9 +30,9 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(0, 1, Team.O),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(moves)
+            val game = TicTacToeGameNormalModeImpl(moves)
 
-            assertEquals(GameType.INFINITY, game.gameType)
+            assertEquals(GameType.NORMAL, game.gameType)
             assertEquals(Team.X, game.currentTeam)
             assertEquals(5, game.currentTurnNumber)
             assertTrue(moves.zip(game.moves).any { it.first == it.second })
@@ -40,45 +41,34 @@ class TicTacToeGameInfinityModeImplTest {
         @Test
         @DisplayName("空いているリストを用いてオブジェクト生成")
         fun generateTicTacToeGameWithEmptyList() {
-            val game = TicTacToeGameInfinityModeImpl(listOf())
+            val game = TicTacToeGameNormalModeImpl(listOf())
 
-            assertEquals(GameType.INFINITY, game.gameType)
+            assertEquals(GameType.NORMAL, game.gameType)
             assertEquals(Team.X, game.currentTeam)
             assertEquals(1, game.currentTurnNumber)
             assertTrue(game.moves.isEmpty())
         }
 
         @Test
-        @DisplayName("movesのサイズが9以上でも、エラーは発生されない")
+        @DisplayName("movesのサイズが9以上であれば、エラー発生")
         fun containMoreThen10Moves() {
-            val moves = listOf(
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(1, 0, Team.O),
-                TicTacToeMove.withCoordinate(2, 2, Team.X),
+            val moves = List(10) { index ->
+                val x = Random.nextInt(0, 3)
+                val y = Random.nextInt(0, 3)
+                val team = if(index % 2 == 0) Team.X else Team.O
+                TicTacToeMove.withCoordinate(x, y, team)
+            }
 
-                TicTacToeMove.withCoordinate(1, 1, Team.O),
-                TicTacToeMove.withCoordinate(1, 2, Team.X),
-                TicTacToeMove.withCoordinate(2, 0, Team.O),
+            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameNormalModeImpl(moves) }
 
-                TicTacToeMove.withCoordinate(0, 2, Team.X),
-                TicTacToeMove.withCoordinate(2, 1, Team.O),
-                TicTacToeMove.withCoordinate(0, 1, Team.X),
-
-                TicTacToeMove.withCoordinate(1, 0, Team.O),
+            assertEquals(
+                "There must be at least 9 moves",
+                exception.message
             )
-
-            val game = TicTacToeGameInfinityModeImpl(moves)
-
-            assertEquals(Team.X, game.currentTeam)
-            assertEquals(11, game.currentTurnNumber)
-            assertTrue(moves.zip(game.moves).all { it.first == it.second })
-
-            assertEquals(6, game.effectiveMoves.size)
-            assertTrue(game.effectiveMoves.zip(moves.takeLast(6)).all { it.first == it.second })
         }
 
         @Test
-        @DisplayName("6手以内（3巡以内）にセルの重複がある場合はエラーが発生")
+        @DisplayName("movesのcellが重複するとエラー発生")
         fun containDuplicatedCells() {
 
             val moves = listOf(
@@ -88,33 +78,12 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(2, 0, Team.O), // (2, 0) duplicated
             )
 
-            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameInfinityModeImpl(moves) }
+            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameNormalModeImpl(moves) }
 
             assertEquals(
-                "Moves must not contain duplicate cells within any 6 moves",
+                "Moves must not contain duplicate cells",
                 exception.message
             )
-        }
-
-        @Test
-        @DisplayName("3巡より前のセルであれば、重複して選択してもエラーが発生しない")
-        fun legalDuplicatedCells() {
-
-            val moves = listOf(
-                TicTacToeMove.withCoordinate(2, 0, Team.X), // (2, 0) duplicated
-                TicTacToeMove.withCoordinate(1, 1, Team.O),
-                TicTacToeMove.withCoordinate(2, 2, Team.X),
-                TicTacToeMove.withCoordinate(1, 0, Team.O),
-                TicTacToeMove.withCoordinate(0, 1, Team.X),
-                TicTacToeMove.withCoordinate(0, 2, Team.O),
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(2, 0, Team.O), // (2, 0) duplicated
-            )
-
-            val game = TicTacToeGameInfinityModeImpl(moves)
-
-            assertEquals(6, game.effectiveMoves.size)
-            assertEquals(6, game.effectiveMoves.map { it.cell }.distinct().size)
         }
 
         @Test
@@ -128,7 +97,7 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(0, 1, Team.X), // Error! consecutive X moves
             )
 
-            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameInfinityModeImpl(moves) }
+            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameNormalModeImpl(moves) }
 
             assertEquals(
                 "Team must alternate turns",
@@ -146,7 +115,7 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(2, 2, Team.O),
             )
 
-            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameInfinityModeImpl(moves) }
+            val exception = assertThrows<IllegalArgumentException> { TicTacToeGameNormalModeImpl(moves) }
 
             assertEquals(
                 "First team must be X",
@@ -167,7 +136,7 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(1, 1, Team.O),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
             assertEquals(TicTacToeGameState.IN_PROGRESS, game.gameState)
         }
@@ -183,7 +152,7 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(2, 2, Team.X),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
             assertEquals(TicTacToeGameState.X_WON, game.gameState)
         }
@@ -200,13 +169,13 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(2, 2, Team.O),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
             assertEquals(TicTacToeGameState.O_WON, game.gameState)
         }
 
         @Test
-        @DisplayName("有効な手は直近6手のみなので、9手目以降もDRAW状態に成らない")
+        @DisplayName("勝利なく9つのセルが埋まった場合、DRAW状態になる")
         fun shouldBeDraw() {
             val sampleMoves = listOf(
                 TicTacToeMove.withCoordinate(0, 0, Team.X),
@@ -220,30 +189,27 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(0, 2, Team.X),
                 TicTacToeMove.withCoordinate(2, 1, Team.O),
                 TicTacToeMove.withCoordinate(0, 1, Team.X),
-
-                TicTacToeMove.withCoordinate(1, 0, Team.O),
-                TicTacToeMove.withCoordinate(2, 2, Team.X),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
-            assertEquals(TicTacToeGameState.IN_PROGRESS, game.gameState)
+            assertEquals(TicTacToeGameState.DRAW, game.gameState)
         }
     }
 
     @Nested
     @DisplayName("moveテスト")
     inner class MoveTest {
+        val sampleMoves = listOf(
+            TicTacToeMove.withCoordinate(0, 0, Team.X),
+            TicTacToeMove.withCoordinate(1, 1, Team.O),
+        )
+
+        val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
         @Test
         @DisplayName("moveメソッドで着手を記録する")
         fun moveSuccessful() {
-            val moves = listOf(
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(1, 1, Team.O),
-            )
-
-            val game = TicTacToeGameInfinityModeImpl(moves)
 
             game.move(Cell(2, 2))
             game.move(Cell(0, 1))
@@ -251,7 +217,7 @@ class TicTacToeGameInfinityModeImplTest {
             val lastTwoMoves = game.moves.takeLast(2)
 
             assertEquals(4, game.moves.size)
-            assertEquals(moves, game.moves.dropLast(2))
+            assertEquals(sampleMoves, game.moves.dropLast(2))
             assertEquals(TicTacToeMove.withCoordinate(2, 2, Team.X), lastTwoMoves[0])
             assertEquals(TicTacToeMove.withCoordinate(0, 1, Team.O), lastTwoMoves[1])
         }
@@ -259,12 +225,6 @@ class TicTacToeGameInfinityModeImplTest {
         @Test
         @DisplayName("xとyの指定して着手を記録する")
         fun moveSuccessfulWithXAndY() {
-            val moves = listOf(
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(1, 1, Team.O),
-            )
-
-            val game = TicTacToeGameInfinityModeImpl(moves)
 
             game.move(2, 2)
             game.move(0, 1)
@@ -272,7 +232,7 @@ class TicTacToeGameInfinityModeImplTest {
             val lastTwoMoves = game.moves.takeLast(2)
 
             assertEquals(4, game.moves.size)
-            assertEquals(moves, game.moves.dropLast(2))
+            assertEquals(sampleMoves, game.moves.dropLast(2))
             assertEquals(TicTacToeMove.withCoordinate(2, 2, Team.X), lastTwoMoves[0])
             assertEquals(TicTacToeMove.withCoordinate(0, 1, Team.O), lastTwoMoves[1])
         }
@@ -280,13 +240,6 @@ class TicTacToeGameInfinityModeImplTest {
         @Test
         @DisplayName("もう着手したセルに再び着手すればエラー発生")
         fun occupiedTest() {
-            val moves = listOf(
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(1, 1, Team.O),
-            )
-
-            val game = TicTacToeGameInfinityModeImpl(moves)
-
             val exception = assertThrows<IllegalArgumentException> { game.move(1, 1) }
 
             assertEquals("cell (x=1, y=1) is already occupied", exception.message)
@@ -295,7 +248,6 @@ class TicTacToeGameInfinityModeImplTest {
         @Test
         @DisplayName("ゲーム終了後に着手するとエラー発生")
         fun whenGameStateIsNotInProgress() {
-
             val sampleMoves = listOf(
                 TicTacToeMove.withCoordinate(0, 0, Team.X),
                 TicTacToeMove.withCoordinate(0, 1, Team.O),
@@ -304,32 +256,11 @@ class TicTacToeGameInfinityModeImplTest {
                 TicTacToeMove.withCoordinate(2, 2, Team.X),
             )
 
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
+            val game = TicTacToeGameNormalModeImpl(sampleMoves)
 
             val exception = assertThrows<IllegalArgumentException> { game.move(1, 0) }
 
             assertEquals("The game is already finished", exception.message)
-        }
-
-        @Test
-        @DisplayName("6手以後、着手すればもっとも古い手から無効になる")
-        fun oldestMovesShouldBeExcludedFromEffectiveMoves() {
-
-            val sampleMoves = listOf(
-                TicTacToeMove.withCoordinate(0, 0, Team.X),
-                TicTacToeMove.withCoordinate(0, 1, Team.O),
-                TicTacToeMove.withCoordinate(1, 1, Team.X),
-                TicTacToeMove.withCoordinate(0, 2, Team.O),
-                TicTacToeMove.withCoordinate(2, 0, Team.X),
-                TicTacToeMove.withCoordinate(2, 2, Team.O),
-            )
-
-            val game = TicTacToeGameInfinityModeImpl(sampleMoves)
-
-            game.move(1, 0)
-
-            assertEquals(6, game.effectiveMoves.size)
-            assertEquals(sampleMoves[1], game.effectiveMoves[0]) // もっとも古いTicTacToeMoveが無効になってeffectiveMovesから除外される
         }
     }
 }
