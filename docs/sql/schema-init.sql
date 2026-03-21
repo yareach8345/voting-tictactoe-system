@@ -1,5 +1,5 @@
 drop table if exists player;
-drop table if exists tictactoe_game;
+drop table if exists tictactoe_game_info;
 drop table if exists game_record;
 drop table if exists game_group_info;
 
@@ -29,11 +29,11 @@ create table if not exists player(
     unique index group_user_idx(group_id, user_id)
 );
 
-create table if not exists tictactoe_game(
+create table if not exists tictactoe_game_info(
     id int primary key auto_increment,
     group_id varchar(255) not null unique,
     type enum('NORMAL','INFINITY') not null default 'NORMAL',
-    state enum('X_WON', 'O_WON', 'DRAW', 'IN_PROGRESS') not null default 'IN_PROGRESS',
+#     state enum('X_WON', 'O_WON', 'DRAW', 'IN_PROGRESS') not null default 'IN_PROGRESS',
 
     foreign key(group_id) references game_group_info(group_id) on delete cascade,
     unique index group_idx(group_id)
