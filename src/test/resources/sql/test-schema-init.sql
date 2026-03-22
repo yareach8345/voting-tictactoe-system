@@ -46,6 +46,7 @@ create table if not exists game_record(
     team VARCHAR(1) check (team in ('O', 'X')),
     x int not null check ( x >= 0 and x <= 2 ),
     y int not null check ( y >= 0 and y <= 2 ),
+    timestamp datetime not null default current_timestamp,
 
     foreign key(group_id) references game_group_info(group_id) on delete cascade
 );
