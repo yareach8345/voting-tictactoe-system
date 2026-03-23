@@ -5,3 +5,7 @@ spring:
     url: ${MYSQL_DATABASE_URL}
     username: ${MYSQL_DATABASE_USERNAME}
     password: ${MYSQL_DATABASE_PASSWORD}
+
+app:
+  voting-system:
+    url: "http://localhost:8081"

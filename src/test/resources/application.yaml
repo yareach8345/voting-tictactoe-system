@@ -13,3 +13,7 @@ logging:
   level:
     org.springframework.r2dbc.core: debug
     com.yareach.voting_tictactoe_system: debug
+
+app:
+  voting-system:
+    url: "http://localhost:8081"
