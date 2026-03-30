@@ -4,6 +4,7 @@ import com.yareach.voting_tictactoe_system.tictactoe.entity.GameRecordR2dbcEntit
 import com.yareach.voting_tictactoe_system.tictactoe.model.TicTacToeMove
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.springframework.stereotype.Repository
 
 interface GameRecordRepository {
     suspend fun save(groupId: String, move: TicTacToeMove): TicTacToeMove
@@ -19,6 +20,7 @@ interface GameRecordRepository {
     suspend fun findByGroupIdOrderByTimeStampAsc(groupId: String): Flow<TicTacToeMove>
 }
 
+@Repository
 class GameRecordRepositoryR2dbcImpl(
     private val gameRecordR2dbcRepository: GameRecordR2dbcRepository
 ) : GameRecordRepository {
