@@ -1,7 +1,10 @@
 package com.yareach.voting_tictactoe_system.unit.player
 
+import com.yareach.voting_tictactoe_system.common.enum.GameType
 import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.ErrorCode
+import com.yareach.voting_tictactoe_system.game_group_info.enum.GameState
+import com.yareach.voting_tictactoe_system.game_group_info.model.GameGroupInfo
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoService
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.player.dto.AddNewPlayerDto
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDateTime
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -63,6 +67,15 @@ class PlayerServiceUnitTest {
         @BeforeEach
         fun setUpRepositoryMock() {
             coEvery { playerRepositoryMock.saveAll(capture(saveAllSlot)) } answers { saveAllSlot.captured.asFlow() }
+
+            coEvery {
+                gameGroupInfoServiceMock.updateGameState(any<String>(), any<GameState>())
+            } answers {
+                val groupId = arg<String>(0)
+                val newState = arg<GameState>(1)
+
+                GameGroupInfo(0, groupId, GameType.INFINITY, newState, LocalDateTime.now())
+            }
         }
 
         @Test
@@ -78,6 +91,9 @@ class PlayerServiceUnitTest {
             val result = playerService.processRecruitMessage(inputFlow).toList()
 
             coVerify { val _unused = playerRepositoryMock.saveAll(any()) }
+
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.RECRUITING) }
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.BEFORE_START) }
 
             result.dropLast(1)
                 .filterIsInstance<RecruitAcceptedDto>()
@@ -111,6 +127,9 @@ class PlayerServiceUnitTest {
 
             coVerify { val _unused = playerRepositoryMock.saveAll(any()) }
 
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.RECRUITING) }
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.BEFORE_START) }
+
             result.dropLast(1)
                 .filterIsInstance<RecruitAcceptedDto>()
                 .also { assertEquals(userIds.size, it.size) }
@@ -142,6 +161,9 @@ class PlayerServiceUnitTest {
 
             val exception = assertThrows<ApiException> { playerService.processRecruitMessage(inputFlow).collect() }
 
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.RECRUITING) }
+            coVerify(exactly = 1) { gameGroupInfoServiceMock.updateGameState(groupId, GameState.FINISHED) }
+
             assertEquals(ErrorCode.NOT_ENOUGH_PLAYERS, exception.errorCode)
         }
 
@@ -153,6 +175,8 @@ class PlayerServiceUnitTest {
                 emit(InitRecruitDto("wrong-group-id"))
                 userIds.forEach { emit(AddNewPlayerDto(userId = it)) }
             }
+
+            coVerify(exactly = 0) { gameGroupInfoServiceMock.updateGameState(groupId, any()) }
 
             val exception = assertThrows<ApiException> { playerService.processRecruitMessage(inputFlow).collect() }
 

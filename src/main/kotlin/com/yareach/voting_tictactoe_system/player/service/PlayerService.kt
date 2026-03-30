@@ -4,6 +4,7 @@ import com.yareach.voting_tictactoe_system.common.error.ApiException
 import com.yareach.voting_tictactoe_system.common.error.ErrorCode
 import com.yareach.voting_tictactoe_system.common.extension.doFirst
 import com.yareach.voting_tictactoe_system.common.extension.logger
+import com.yareach.voting_tictactoe_system.game_group_info.enum.GameState
 import com.yareach.voting_tictactoe_system.game_group_info.service.GameGroupInfoService
 import com.yareach.voting_tictactoe_system.player.common.Team
 import com.yareach.voting_tictactoe_system.player.dto.AddNewPlayerDto
@@ -66,6 +67,8 @@ class PlayerServiceImpl(
                         throw ApiException(ErrorCode.INVALID_GROUP_ID, "can't find group with the id ${it.groupId}")
                     }
 
+                    gameGroupInfoService.updateGameState(it.groupId, GameState.RECRUITING)
+
                     groupId = it.groupId
                 }.collect {
                     // 二番目からのメッセージは全てゲームに参加するユーザーのＩＤ
@@ -97,8 +100,11 @@ class PlayerServiceImpl(
         }
 
         if (setOfUserId.size < 2) {
+            gameGroupInfoService.updateGameState(groupId, GameState.FINISHED)
             throw ApiException(ErrorCode.NOT_ENOUGH_PLAYERS, "At least two users are required")
         }
+
+        gameGroupInfoService.updateGameState(groupId, GameState.BEFORE_START)
 
         val divideTeamResult = divideTeam(setOfUserId)
 
