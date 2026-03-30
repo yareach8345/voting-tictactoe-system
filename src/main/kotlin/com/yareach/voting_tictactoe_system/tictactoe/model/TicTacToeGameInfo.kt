@@ -6,4 +6,16 @@ data class TicTacToeGameInfo(
     val id: Long? = null,
     val groupId: String,
     val type: GameType,
-)
+) {
+    companion object {
+        fun of(
+            groupId: String,
+            gameType: GameType,
+        ): TicTacToeGameInfo {
+            return TicTacToeGameInfo(
+                groupId = groupId,
+                type = gameType,
+            )
+        }
+    }
+}
